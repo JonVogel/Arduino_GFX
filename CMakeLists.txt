@@ -17,4 +17,17 @@ idf_component_register(
     INCLUDE_DIRS "src"
     REQUIRES
         arduino   # Arduino-style API the library is built on
+        esp_lcd   # esp_lcd_panel_interface.h, esp_lcd_panel_rgb.h,
+                  # esp_lcd_panel_ops.h (used by Arduino_ESP32LCD8 /
+                  # Arduino_ESP32RGBPanel etc.)
+)
+
+# Suppress two -Werror flavors that the IDF default flags promote
+# but upstream Arduino_GFX trips on the ESP-IDF v5.5 toolchain:
+#   - overloaded-virtual: Arduino_GFX::flush(bool) overload hides
+#     Print::flush() from arduino-esp32's Stream/Print stack.
+#   - format-truncation / unused-* are already on Wno-error by default.
+target_compile_options(${COMPONENT_LIB} PRIVATE
+    -Wno-error=overloaded-virtual
+    -Wno-error=missing-field-initializers
 )
